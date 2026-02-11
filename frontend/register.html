@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Register Admin</title>
+
+  <style>
+    body {
+      font-family: Arial;
+      background: #f4f4f4;
+      text-align: center;
+      margin-top: 100px;
+    }
+
+    .box {
+      background: white;
+      width: 300px;
+      margin: auto;
+      padding: 20px;
+      border-radius: 5px;
+    }
+
+    input, button {
+      width: 100%;
+      padding: 8px;
+      margin: 8px 0;
+    }
+
+    button {
+      background: #2196F3;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+
+    a {
+      display: block;
+      margin-top: 10px;
+      text-decoration: none;
+      color: blue;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="box">
+
+  <h2>Register Admin</h2>
+
+  <input id="user" placeholder="Username">
+  <input id="pass" type="password" placeholder="Password">
+
+  <button onclick="register()">Register</button>
+
+  <p id="msg"></p>
+
+  <!-- Login Link -->
+  <a href="login.html">Already have account? Login</a>
+
+</div>
+
+
+<script>
+async function register(){
+
+  const username =
+    document.getElementById("user").value;
+
+  const password =
+    document.getElementById("pass").value;
+
+  const res = await fetch(
+    "http://localhost:5000/api/register",
+    {
+      method: "POST",
+      headers: {
+        "Content-Type":"application/json"
+      },
+      body: JSON.stringify({username,password})
+    }
+  );
+
+  const data = await res.json();
+
+  if(data.message){
+    document.getElementById("msg").innerText =
+      "Registered successfully! You can login now.";
+  }
+  else{
+    document.getElementById("msg").innerText =
+      data.error;
+  }
+}
+</script>
+
+</body>
+</html>

@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Mini CRM Dashboard</title>
+
+  <style>
+    body {
+      font-family: Arial;
+      background: #f4f4f4;
+      padding: 20px;
+    }
+
+    h2 {
+      text-align: center;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+      margin-top: 20px;
+    }
+
+    th, td {
+      border: 1px solid #ddd;
+      padding: 8px;
+      text-align: center;
+    }
+
+    th {
+      background: #333;
+      color: white;
+    }
+
+    select, textarea, button {
+      width: 100%;
+      padding: 5px;
+    }
+
+    button {
+      background: green;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+
+    button:hover {
+      opacity: 0.8;
+    }
+  </style>
+</head>
+
+<body>
+
+<h2>📊 Mini CRM Dashboard</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Email</th>
+      <th>Source</th>
+      <th>Status</th>
+      <th>Notes</th>
+      <th>Action</th>
+    </tr>
+  </thead>
+
+  <tbody id="leadTable">
+    <!-- Data will load here -->
+  </tbody>
+</table>
+
+<script>
+
+// 🔐 LOGIN PROTECTION (VERY IMPORTANT)
+if (!localStorage.getItem("admin")) {
+  window.location = "login.html";
+}
+
+
+// API URL
+const API = "http://localhost:5000/api/leads";
+
+
+// Load Leads
+async function loadLeads() {
+
+  const res = await fetch(API);
+  const leads = await res.json();
+
+  const table = document.getElementById("leadTable");
+  table.innerHTML = "";
+
+  leads.forEach((lead) => {
+
+    const row = document.createElement("tr");
+
+    row.innerHTML = `
+      <td>${lead.name}</td>
+      <td>${lead.email}</td>
+      <td>${lead.source}</td>
+
+      <td>
+        <select id="status-${lead.id}">
+          <option ${lead.status=="New"?"selected":""}>New</option>
+          <option ${lead.status=="Contacted"?"selected":""}>Contacted</option>
+          <option ${lead.status=="Converted"?"selected":""}>Converted</option>
+        </select>
+      </td>
+
+      <td>
+        <textarea id="notes-${lead.id}">${lead.notes || ""}</textarea>
+      </td>
+
+      <td>
+        <button onclick="updateLead(${lead.id})">
+          Save
+        </button>
+      </td>
+    `;
+
+    table.appendChild(row);
+  });
+}
+
+
+// Update Lead
+async function updateLead(id) {
+
+  const status = document.getElementById(`status-${id}`).value;
+  const notes = document.getElementById(`notes-${id}`).value;
+
+  await fetch(`${API}/${id}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ status, notes }),
+  });
+
+  alert("Updated Successfully ✅");
+}
+
+
+// Load on start
+loadLeads();
+
+</script>
+
+</body>
+</html>
